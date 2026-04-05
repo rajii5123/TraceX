@@ -2,67 +2,124 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Recycle App Prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TraceX</title>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Font Awesome for Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-  body { font-family: Arial; padding: 20px; }
-  .hidden { display: none; }
-  input, select, button { margin: 5px 0; padding: 5px; }
-  .device { border: 1px solid #ccc; padding: 10px; margin: 5px 0; }
-  .dashboard { margin-top: 20px; border-top: 2px solid #000; padding-top: 10px; }
+body { font-family: 'Poppins', sans-serif; background-color: #f0f8ff; }
+.navbar { background-color: #28a745; color: white; }
+.navbar-brand { color: white; font-weight: 600; }
+.device-card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 10px; }
+.status-badge { padding: 5px 10px; border-radius: 12px; color: white; font-weight: 500; }
+.active { background-color: #007bff; }
+.waste { background-color: #fd7e14; }
+.collected { background-color: #6f42c1; }
+.recycled { background-color: #28a745; }
 </style>
 </head>
 <body>
 
-<h2>Recycle App Prototype</h2>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">TraceX</a>
+  </div>
+</nav>
 
-<!-- Login Page -->
-<div id="loginPage">
-  <h3>Login</h3>
-  <input type="text" id="username" placeholder="Username"><br>
-  <button onclick="login()">Login</button>
+<div class="container mt-4">
+
+  <!-- Login Page -->
+  <div id="loginPage">
+    <h3>Login</h3>
+    <input type="text" id="username" class="form-control mb-2" placeholder="Username">
+    <button class="btn btn-success w-100" onclick="login()">Login</button>
+  </div>
+
+  <!-- Home Page -->
+  <div id="homePage" class="d-none">
+    <h3>Welcome, <span id="userDisplay"></span>!</h3>
+    <div class="d-grid gap-2 mt-3">
+      <button class="btn btn-primary" onclick="showPage('addDevicePage')"><i class="fa fa-plus"></i> Add Device</button>
+      <button class="btn btn-warning" onclick="showPage('trackDevicePage')"><i class="fa fa-list"></i> Track Devices</button>
+      <button class="btn btn-info" onclick="showPage('dashboardPage')"><i class="fa fa-chart-bar"></i> Dashboard</button>
+      <button class="btn btn-danger" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- Add Device Page -->
+  <div id="addDevicePage" class="d-none mt-3">
+    <h3>Add Device</h3>
+    <input type="text" id="deviceName" class="form-control mb-2" placeholder="Device Name">
+    <select id="deviceCondition" class="form-select mb-2">
+      <option value="New">New</option>
+      <option value="Used">Used</option>
+      <option value="Broken">Broken</option>
+    </select>
+    <button class="btn btn-success w-100 mb-2" onclick="addDevice()">Add Device</button>
+    <button class="btn btn-secondary w-100" onclick="showPage('homePage')">Back</button>
+  </div>
+
+  <!-- Track Device Page -->
+  <div id="trackDevicePage" class="d-none mt-3">
+    <h3>Track Devices</h3>
+    <div id="deviceList"></div>
+    <button class="btn btn-secondary w-100 mt-2" onclick="showPage('homePage')">Back</button>
+  </div>
+
+  <!-- Dashboard Page -->
+  <div id="dashboardPage" class="d-none mt-3">
+    <h3>Dashboard</h3>
+    <div class="mb-2">Total Devices: <span id="totalDevices">0</span></div>
+    <div class="mb-2">Recycled Devices: <span id="recycledDevices">0</span></div>
+    <div class="mb-3">Points Earned: <span id="userPointsDisplay">0</span></div>
+
+    <h5>Device Status Overview</h5>
+    <canvas id="deviceChart" width="400" height="200"></canvas>
+
+    <button class="btn btn-secondary w-100 mt-3" onclick="showPage('homePage')">Back</button>
+  </div>
+
 </div>
 
-<!-- Home Page -->
-<div id="homePage" class="hidden">
-  <h3>Welcome, <span id="userDisplay"></span>!</h3>
-  <button onclick="showPage('addDevicePage')">Add Device</button>
-  <button onclick="showPage('trackDevicePage')">Track Devices</button>
-  <button onclick="showPage('dashboardPage')">Dashboard</button>
-  <button onclick="logout()">Logout</button>
-</div>
-
-<!-- Add Device Page -->
-<div id="addDevicePage" class="hidden">
-  <h3>Add Device</h3>
-  <input type="text" id="deviceName" placeholder="Device Name"><br>
-  <select id="deviceCondition">
-    <option value="New">New</option>
-    <option value="Used">Used</option>
-    <option value="Broken">Broken</option>
-  </select><br>
-  <button onclick="addDevice()">Add Device</button>
-  <button onclick="showPage('homePage')">Back</button>
-</div>
-
-<!-- Track Device Page -->
-<div id="trackDevicePage" class="hidden">
-  <h3>Track Devices</h3>
-  <div id="deviceList"></div>
-  <button onclick="showPage('homePage')">Back</button>
-</div>
-
-<!-- Dashboard Page -->
-<div id="dashboardPage" class="hidden">
-  <h3>Dashboard</h3>
-  <div id="dashboardStats"></div>
-  <button onclick="showPage('homePage')">Back</button>
-</div>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 let currentUser = '';
 let userPoints = 0;
 let devices = [];
+let deviceChart;
+
+// Load saved data from localStorage
+function loadData() {
+    const savedDevices = localStorage.getItem('traceX_devices');
+    const savedPoints = localStorage.getItem('traceX_points');
+    if(savedDevices) devices = JSON.parse(savedDevices);
+    if(savedPoints) userPoints = parseInt(savedPoints);
+}
+
+// Save data to localStorage
+function saveData() {
+    localStorage.setItem('traceX_devices', JSON.stringify(devices));
+    localStorage.setItem('traceX_points', userPoints);
+}
+
+// On page load
+window.onload = () => {
+    loadData();
+};
 
 function login() {
     const username = document.getElementById('username').value;
@@ -70,9 +127,7 @@ function login() {
         currentUser = username;
         document.getElementById('userDisplay').innerText = currentUser;
         showPage('homePage');
-    } else {
-        alert("Enter username");
-    }
+    } else { alert("Enter username"); }
 }
 
 function logout() {
@@ -80,15 +135,16 @@ function logout() {
     showPage('loginPage');
 }
 
-// Switch between pages
 function showPage(pageId) {
     ['loginPage','homePage','addDevicePage','trackDevicePage','dashboardPage'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
+        document.getElementById(id).classList.add('d-none');
     });
-    document.getElementById(pageId).classList.remove('hidden');
+    document.getElementById(pageId).classList.remove('d-none');
+    if(pageId === 'trackDevicePage') renderDevices();
+    if(pageId === 'dashboardPage') renderDashboard();
 }
 
-// Add a new device
+// Add device
 function addDevice() {
     const name = document.getElementById('deviceName').value;
     const condition = document.getElementById('deviceCondition').value;
@@ -97,27 +153,29 @@ function addDevice() {
     const id = "EW" + Math.floor(Math.random() * 1000);
     const device = { id, name, condition, status: "Active" };
     devices.push(device);
+    saveData();
     alert(`Device Added with ID: ${id}`);
     document.getElementById('deviceName').value = '';
 }
 
-// Track Devices
+// Render devices
 function renderDevices() {
     const list = document.getElementById('deviceList');
     list.innerHTML = '';
     devices.forEach(device => {
+        const statusClass = device.status.toLowerCase();
         const div = document.createElement('div');
-        div.className = 'device';
+        div.className = 'device-card';
         div.innerHTML = `
-            <b>${device.name}</b> (${device.condition})<br>
-            Status: ${device.status}<br>
-            ${device.status !== 'Recycled' ? `<button onclick="recycleDevice('${device.id}')">Recycle Now</button>` : ''}
+            <h5>${device.name} <small class="text-muted">(${device.condition})</small></h5>
+            <span class="status-badge ${statusClass}">${device.status}</span><br>
+            ${device.status !== 'Recycled' ? `<button class="btn btn-outline-success btn-sm mt-2" onclick="recycleDevice('${device.id}')"><i class="fa fa-recycle"></i> Recycle</button>` : ''}
         `;
         list.appendChild(div);
     });
 }
 
-// Recycle Device
+// Recycle device
 function recycleDevice(id) {
     let device = devices.find(d => d.id === id);
     if(device) {
@@ -128,29 +186,45 @@ function recycleDevice(id) {
             userPoints += 50;
             alert(`You earned 50 points! Total: ${userPoints}`);
         }
+        saveData();
         renderDevices();
+        renderDashboard();
     }
 }
 
-// Dashboard
+// Dashboard with Chart
 function renderDashboard() {
     const total = devices.length;
     const recycled = devices.filter(d => d.status === 'Recycled').length;
-    const stats = `
-        Total Devices: ${total}<br>
-        Recycled Devices: ${recycled}<br>
-        Points Earned: ${userPoints}
-    `;
-    document.getElementById('dashboardStats').innerHTML = stats;
-}
+    const collected = devices.filter(d => d.status === 'Collected').length;
+    const waste = devices.filter(d => d.status === 'Waste').length;
+    const active = devices.filter(d => d.status === 'Active').length;
 
-// Update pages when opened
-document.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('click', () => {
-        renderDevices();
-        renderDashboard();
+    document.getElementById('totalDevices').innerText = total;
+    document.getElementById('recycledDevices').innerText = recycled;
+    document.getElementById('userPointsDisplay').innerText = userPoints;
+
+    if(deviceChart) deviceChart.destroy();
+    const ctx = document.getElementById('deviceChart').getContext('2d');
+    deviceChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Active', 'Waste', 'Collected', 'Recycled'],
+            datasets: [{
+                label: 'Devices',
+                data: [active, waste, collected, recycled],
+                backgroundColor: ['#007bff','#fd7e14','#6f42c1','#28a745']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' },
+                title: { display: true, text: 'Device Status Distribution' }
+            }
+        }
     });
-});
+}
 </script>
 
 </body>
