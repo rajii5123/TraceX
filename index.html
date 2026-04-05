@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recycle App Prototype</title>
+<style>
+  body { font-family: Arial; padding: 20px; }
+  .hidden { display: none; }
+  input, select, button { margin: 5px 0; padding: 5px; }
+  .device { border: 1px solid #ccc; padding: 10px; margin: 5px 0; }
+  .dashboard { margin-top: 20px; border-top: 2px solid #000; padding-top: 10px; }
+</style>
+</head>
+<body>
+
+<h2>Recycle App Prototype</h2>
+
+<!-- Login Page -->
+<div id="loginPage">
+  <h3>Login</h3>
+  <input type="text" id="username" placeholder="Username"><br>
+  <button onclick="login()">Login</button>
+</div>
+
+<!-- Home Page -->
+<div id="homePage" class="hidden">
+  <h3>Welcome, <span id="userDisplay"></span>!</h3>
+  <button onclick="showPage('addDevicePage')">Add Device</button>
+  <button onclick="showPage('trackDevicePage')">Track Devices</button>
+  <button onclick="showPage('dashboardPage')">Dashboard</button>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<!-- Add Device Page -->
+<div id="addDevicePage" class="hidden">
+  <h3>Add Device</h3>
+  <input type="text" id="deviceName" placeholder="Device Name"><br>
+  <select id="deviceCondition">
+    <option value="New">New</option>
+    <option value="Used">Used</option>
+    <option value="Broken">Broken</option>
+  </select><br>
+  <button onclick="addDevice()">Add Device</button>
+  <button onclick="showPage('homePage')">Back</button>
+</div>
+
+<!-- Track Device Page -->
+<div id="trackDevicePage" class="hidden">
+  <h3>Track Devices</h3>
+  <div id="deviceList"></div>
+  <button onclick="showPage('homePage')">Back</button>
+</div>
+
+<!-- Dashboard Page -->
+<div id="dashboardPage" class="hidden">
+  <h3>Dashboard</h3>
+  <div id="dashboardStats"></div>
+  <button onclick="showPage('homePage')">Back</button>
+</div>
+
+<script>
+let currentUser = '';
+let userPoints = 0;
+let devices = [];
+
+function login() {
+    const username = document.getElementById('username').value;
+    if(username) {
+        currentUser = username;
+        document.getElementById('userDisplay').innerText = currentUser;
+        showPage('homePage');
+    } else {
+        alert("Enter username");
+    }
+}
+
+function logout() {
+    currentUser = '';
+    showPage('loginPage');
+}
+
+// Switch between pages
+function showPage(pageId) {
+    ['loginPage','homePage','addDevicePage','trackDevicePage','dashboardPage'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+    document.getElementById(pageId).classList.remove('hidden');
+}
+
+// Add a new device
+function addDevice() {
+    const name = document.getElementById('deviceName').value;
+    const condition = document.getElementById('deviceCondition').value;
+    if(!name) { alert("Enter device name"); return; }
+
+    const id = "EW" + Math.floor(Math.random() * 1000);
+    const device = { id, name, condition, status: "Active" };
+    devices.push(device);
+    alert(`Device Added with ID: ${id}`);
+    document.getElementById('deviceName').value = '';
+}
+
+// Track Devices
+function renderDevices() {
+    const list = document.getElementById('deviceList');
+    list.innerHTML = '';
+    devices.forEach(device => {
+        const div = document.createElement('div');
+        div.className = 'device';
+        div.innerHTML = `
+            <b>${device.name}</b> (${device.condition})<br>
+            Status: ${device.status}<br>
+            ${device.status !== 'Recycled' ? `<button onclick="recycleDevice('${device.id}')">Recycle Now</button>` : ''}
+        `;
+        list.appendChild(div);
+    });
+}
+
+// Recycle Device
+function recycleDevice(id) {
+    let device = devices.find(d => d.id === id);
+    if(device) {
+        if(device.status === 'Active') device.status = 'Waste';
+        else if(device.status === 'Waste') device.status = 'Collected';
+        else if(device.status === 'Collected') {
+            device.status = 'Recycled';
+            userPoints += 50;
+            alert(`You earned 50 points! Total: ${userPoints}`);
+        }
+        renderDevices();
+    }
+}
+
+// Dashboard
+function renderDashboard() {
+    const total = devices.length;
+    const recycled = devices.filter(d => d.status === 'Recycled').length;
+    const stats = `
+        Total Devices: ${total}<br>
+        Recycled Devices: ${recycled}<br>
+        Points Earned: ${userPoints}
+    `;
+    document.getElementById('dashboardStats').innerHTML = stats;
+}
+
+// Update pages when opened
+document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        renderDevices();
+        renderDashboard();
+    });
+});
+</script>
+
+</body>
+</html>
